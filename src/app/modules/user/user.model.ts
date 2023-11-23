@@ -30,7 +30,7 @@ const userSchema = new Schema<TUser>({
   userId: {
     type: Number,
     unique: true,
-    required: true,
+    required: [true, ' User id must be unique'],
   },
   username: {
     type: String,
