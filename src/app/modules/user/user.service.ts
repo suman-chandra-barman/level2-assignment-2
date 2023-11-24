@@ -1,9 +1,9 @@
-import { TUser } from './user.interface';
+import { TUser, TUserOrders } from './user.interface';
 import { User } from './user.model';
 
 const createUserIntoDB = async (user: TUser) => {
   const newUser = await User.create(user);
-  const { _id, password, ...withOutPassword } = newUser.toJSON();
+  const { password, ...withOutPassword } = newUser.toJSON();
   return withOutPassword;
 };
 const getAllUsersFromBD = async () => {
@@ -21,7 +21,7 @@ const getAllUsersFromBD = async () => {
 const getSingleUserFromBD = async (id: string) => {
   if (await User.isUserExists(id)) {
     const result = await User.findOne({ userId: id });
-    const { _id, password, ...withOutPassword } = result?.toJSON();
+    const { password, ...withOutPassword } = result?.toJSON();
     return withOutPassword;
   } else {
     throw new Error();
@@ -34,8 +34,39 @@ const updateUserFromDB = async (id: string, updatedUserData: TUser) => {
       updatedUserData,
       { new: true },
     );
-    const { _id, password, ...withOutPassword } = result?.toJSON();
+    const { password, ...withOutPassword } = result?.toJSON();
     return withOutPassword;
+  } else {
+    throw new Error();
+  }
+};
+const deleteUserFromDB = async (id: string) => {
+  if (await User.isUserExists(id)) {
+    const result = await User.deleteOne({ userId: id });
+    return result;
+  } else {
+    throw new Error();
+  }
+};
+
+const updateOrCreateOrdersIntoDB = async (
+  id: string,
+  orderData: TUserOrders,
+) => {
+  if (await User.isUserExists(id)) {
+    const user = await User.findOne({ userId: id });
+    const { productName, price, quantity } = orderData;
+    const newOrder: TUserOrders = {
+      productName,
+      price,
+      quantity,
+    };
+
+    if (!user?.orders) {
+      user.orders = [];
+    }
+    user.orders.push(newOrder);
+    await user.save();
   } else {
     throw new Error();
   }
@@ -46,4 +77,6 @@ export const UserServices = {
   getAllUsersFromBD,
   getSingleUserFromBD,
   updateUserFromDB,
+  deleteUserFromDB,
+  updateOrCreateOrdersIntoDB,
 };

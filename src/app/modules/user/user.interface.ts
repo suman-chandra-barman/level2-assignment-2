@@ -10,6 +10,11 @@ export type TUserAddress = {
   country: string;
 };
 
+export type TUserOrders = {
+  productName: string;
+  price: number;
+  quantity: number;
+};
 export type TUser = {
   userId: number;
   username: string;
@@ -20,6 +25,7 @@ export type TUser = {
   isActive: boolean;
   hobbies: string[];
   address: TUserAddress;
+  orders?: TUserOrders[];
 };
 
 export interface UserModel extends Model<TUser> {

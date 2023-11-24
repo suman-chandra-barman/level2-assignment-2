@@ -3,6 +3,7 @@ import {
   TUser,
   TUserAddress,
   TUserFullName,
+  TUserOrders,
   UserModel,
 } from './user.interface';
 import bcrypt from 'bcrypt';
@@ -33,6 +34,21 @@ const userAddressSchema = new Schema<TUserAddress>({
     required: true,
   },
 });
+const userOrderSchema = new Schema<TUserOrders>({
+  productName: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+});
+
 const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
@@ -72,6 +88,9 @@ const userSchema = new Schema<TUser, UserModel>({
     type: userAddressSchema,
     required: true,
   },
+  orders: {
+    type: [userOrderSchema],
+  },
 });
 
 // middlewares
@@ -79,10 +98,6 @@ userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
   user.password = await bcrypt.hash(user.password, Number(config.salt_rounds));
-  next();
-});
-userSchema.post('save', function (doc, next) {
-  doc.password = '';
   next();
 });
 
