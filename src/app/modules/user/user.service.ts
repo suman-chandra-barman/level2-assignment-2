@@ -81,6 +81,22 @@ const getOrdersFromUserDB = async (id: string) => {
     throw new Error();
   }
 };
+const getTotalPriceOfOrderFromDB = async (id: string) => {
+  if (await User.isUserExists(id)) {
+    const user = await User.findOne({ userId: id });
+    const orders = user?.orders;
+    if (orders?.length) {
+      let total: number = 0;
+      orders.map((order) => {
+        total += order.price * order.quantity;
+      });
+      return total;
+    }
+    throw new Error('The user has no order!');
+  } else {
+    throw new Error();
+  }
+};
 
 export const UserServices = {
   createUserIntoDB,
@@ -90,4 +106,5 @@ export const UserServices = {
   deleteUserFromDB,
   updateOrCreateOrdersIntoDB,
   getOrdersFromUserDB,
+  getTotalPriceOfOrderFromDB,
 };
