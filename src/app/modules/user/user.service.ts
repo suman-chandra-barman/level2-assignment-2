@@ -6,7 +6,7 @@ const createUserIntoDB = async (user: TUser) => {
   const { password, ...withOutPassword } = newUser.toJSON();
   return withOutPassword;
 };
-const getAllUsersFromBD = async () => {
+const getAllUsersFromDB = async () => {
   const users = await User.find();
 
   const formattedUsers = users.map((user) => ({
@@ -18,7 +18,7 @@ const getAllUsersFromBD = async () => {
   }));
   return formattedUsers;
 };
-const getSingleUserFromBD = async (id: string) => {
+const getSingleUserFromDB = async (id: string) => {
   if (await User.isUserExists(id)) {
     const result = await User.findOne({ userId: id });
     const { password, ...withOutPassword } = result?.toJSON();
@@ -72,11 +72,22 @@ const updateOrCreateOrdersIntoDB = async (
   }
 };
 
+const getOrdersFromUserDB = async (id: string) => {
+  if (await User.isUserExists(id)) {
+    const user = await User.findOne({ userId: id });
+    const orders = user?.orders;
+    return orders;
+  } else {
+    throw new Error();
+  }
+};
+
 export const UserServices = {
   createUserIntoDB,
-  getAllUsersFromBD,
-  getSingleUserFromBD,
+  getAllUsersFromDB,
+  getSingleUserFromDB,
   updateUserFromDB,
   deleteUserFromDB,
   updateOrCreateOrdersIntoDB,
+  getOrdersFromUserDB,
 };

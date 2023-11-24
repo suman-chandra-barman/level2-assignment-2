@@ -26,7 +26,7 @@ const createUser = async (req: Request, res: Response) => {
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const result = await UserServices.getAllUsersFromBD();
+    const result = await UserServices.getAllUsersFromDB();
     res.status(200).json({
       success: true,
       message: 'Users fetched successfully!',
@@ -43,7 +43,7 @@ const getAllUsers = async (req: Request, res: Response) => {
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
-    const result = await UserServices.getSingleUserFromBD(id);
+    const result = await UserServices.getSingleUserFromDB(id);
     res.status(200).json({
       success: true,
       message: 'User fetched successfully!',
@@ -123,7 +123,26 @@ const updateOrCreateOrders = async (req: Request, res: Response) => {
     });
   }
 };
-
+const getUserOrders = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.userId;
+    const result = await UserServices.getOrdersFromUserDB(id);
+    res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully!',
+      data: { orders: result },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
+  }
+};
 export const UserControllers = {
   createUser,
   getAllUsers,
@@ -131,4 +150,5 @@ export const UserControllers = {
   updatedUser,
   deleteUser,
   updateOrCreateOrders,
+  getUserOrders,
 };
