@@ -1,8 +1,19 @@
-# Mongoose Express CRUD Mastery
-## project scripts
-start: "node ./dist/server.js", <br>
-start:dev: "ts-node-dev --respawn --transpile-only ./src/server.ts", <br>
-lint: "eslint src --ignore-path .eslintignore --ext .ts",<br>
-lint:fix: "npx eslint src --fix",<br>
-prettier: "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",<br>
-prettier:fix: "npx prettier --write src",<br>
+## `Install dependencies`:
+npm install
+##  Available Scripts
+###  `Start the Application (Production) `:
+npm start
+###  `Start the Application (Development) `:
+npm run start:dev
+###  `Build the Project `:
+npm run build
+## Linting
+### ` Run ESLint `:
+npm run lint
+###  `Fix ESLint Issues: `
+npm run lint:fix
+##  Prettier 
+### ` Format code with Prettier: `
+npm run prettier
+### ` Fix Prettier Issues: `
+npm run prettier:fix
