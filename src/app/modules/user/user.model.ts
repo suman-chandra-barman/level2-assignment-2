@@ -9,7 +9,6 @@ import {
 import bcrypt from 'bcrypt';
 import config from '../../config';
 
-// create schema
 const userFullNameSchema = new Schema<TUserFullName>({
   firstName: {
     type: String,
@@ -53,7 +52,7 @@ const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
     unique: true,
-    required: [true, ' User id must be unique'],
+    required: true,
   },
   username: {
     type: String,

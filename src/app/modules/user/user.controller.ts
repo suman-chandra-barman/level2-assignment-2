@@ -1,24 +1,28 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
-import userValidationSchema from './user.validation';
+import {
+  orderValidationSchema,
+  partialUserValidationSchema,
+  userValidationSchema,
+} from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
     const user = req.body;
 
-    // data validation using zod
-    const zodParseData = userValidationSchema.parse(user);
-    const result = await UserServices.createUserIntoDB(zodParseData);
+    // using zod validation
+    userValidationSchema.parse(user);
+    const result = await UserServices.createUserIntoDB(user);
 
     res.status(201).json({
       success: true,
       message: 'User created successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Something went wrong!',
+      message: error.message || 'Something went wrong!',
       error,
     });
   }
@@ -40,6 +44,7 @@ const getAllUsers = async (req: Request, res: Response) => {
     });
   }
 };
+
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
@@ -60,20 +65,22 @@ const getSingleUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 const updatedUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const updatedUserData = req.body;
+    partialUserValidationSchema.parse(updatedUserData);
     const result = await UserServices.updateUserFromDB(userId, updatedUserData);
     res.status(200).json({
       success: true,
       message: 'User updated successfully!',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'User not found',
+      message: error.message || 'User not found',
       error: {
         code: 404,
         description: 'User not found!',
@@ -81,6 +88,7 @@ const updatedUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -106,13 +114,14 @@ const updateOrCreateOrders = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const orders = req.body;
-    await UserServices.updateOrCreateOrdersIntoDB(userId, orders);
+    const zodParseData = orderValidationSchema.parse(orders);
+    await UserServices.updateOrCreateOrdersIntoDB(userId, zodParseData);
     res.status(200).json({
       success: true,
       message: 'Order created successfully!',
       data: null,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
       message: 'User not found',
@@ -123,6 +132,7 @@ const updateOrCreateOrders = async (req: Request, res: Response) => {
     });
   }
 };
+
 const getUserOrders = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
@@ -143,6 +153,7 @@ const getUserOrders = async (req: Request, res: Response) => {
     });
   }
 };
+
 const getTotalPriceOfOrder = async (req: Request, res: Response) => {
   try {
     const id = req.params.userId;
@@ -163,6 +174,7 @@ const getTotalPriceOfOrder = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const UserControllers = {
   createUser,
   getAllUsers,

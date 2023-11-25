@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+const orderValidationSchema = z.object({
+  productName: z.string(),
+  price: z.number(),
+  quantity: z.number(),
+});
+
 const userValidationSchema = z.object({
   userId: z.number(),
   username: z.string(),
@@ -17,15 +23,14 @@ const userValidationSchema = z.object({
     city: z.string(),
     country: z.string(),
   }),
-  orders: z
-    .array(
-      z.object({
-        productName: z.string(),
-        price: z.number(),
-        quantity: z.number(),
-      }),
-    )
-    .optional(),
+  orders: z.array(orderValidationSchema).optional(),
 });
 
-export default userValidationSchema;
+// Define a separate schema for partial updates
+const partialUserValidationSchema = userValidationSchema.partial();
+
+export {
+  userValidationSchema,
+  orderValidationSchema,
+  partialUserValidationSchema,
+};

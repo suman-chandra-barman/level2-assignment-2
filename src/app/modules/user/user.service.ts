@@ -1,14 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+
 import { TUser, TUserOrders } from './user.interface';
 import { User } from './user.model';
 
 const createUserIntoDB = async (user: TUser) => {
   const newUser = await User.create(user);
-  const { password, ...withOutPassword } = newUser.toJSON();
+  const { _id, orders, password, ...withOutPassword } = newUser.toJSON();
   return withOutPassword;
 };
+
 const getAllUsersFromDB = async () => {
   const users = await User.find();
-
   const formattedUsers = users.map((user) => ({
     username: user.username,
     fullName: user.fullName,
@@ -18,15 +21,19 @@ const getAllUsersFromDB = async () => {
   }));
   return formattedUsers;
 };
+
 const getSingleUserFromDB = async (id: string) => {
   if (await User.isUserExists(id)) {
     const result = await User.findOne({ userId: id });
-    const { password, ...withOutPassword } = result?.toJSON();
-    return withOutPassword;
+    if (result) {
+      const { _id, orders, password, ...withOutPassword } = result.toJSON();
+      return withOutPassword;
+    }
   } else {
     throw new Error();
   }
 };
+
 const updateUserFromDB = async (id: string, updatedUserData: TUser) => {
   if (await User.isUserExists(id)) {
     const result = await User.findOneAndUpdate(
@@ -34,12 +41,15 @@ const updateUserFromDB = async (id: string, updatedUserData: TUser) => {
       updatedUserData,
       { new: true },
     );
-    const { password, ...withOutPassword } = result?.toJSON();
-    return withOutPassword;
+    if (result) {
+      const { _id, orders, password, ...withOutPassword } = result.toJSON();
+      return withOutPassword;
+    }
   } else {
     throw new Error();
   }
 };
+
 const deleteUserFromDB = async (id: string) => {
   if (await User.isUserExists(id)) {
     const result = await User.deleteOne({ userId: id });
@@ -55,18 +65,19 @@ const updateOrCreateOrdersIntoDB = async (
 ) => {
   if (await User.isUserExists(id)) {
     const user = await User.findOne({ userId: id });
-    const { productName, price, quantity } = orderData;
-    const newOrder: TUserOrders = {
-      productName,
-      price,
-      quantity,
-    };
-
-    if (!user?.orders) {
-      user.orders = [];
+    if (user) {
+      const { productName, price, quantity } = orderData;
+      const newOrder: TUserOrders = {
+        productName,
+        price,
+        quantity,
+      };
+      if (!user?.orders) {
+        user.orders = [];
+      }
+      user.orders.push(newOrder);
+      await user.save();
     }
-    user.orders.push(newOrder);
-    await user.save();
   } else {
     throw new Error();
   }
